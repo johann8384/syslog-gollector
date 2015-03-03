@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"regexp"
 	"strconv"
-
+	"log"
 	"github.com/rcrowley/go-metrics"
 )
 
@@ -62,6 +62,10 @@ func (p *Rfc5424Parser) StreamingParse(in chan string) (chan string, error) {
 			}
 			b, err := json.Marshal(*parsed)
 			if err != nil {
+				var buf bytes.Buffer
+				logger := log.New(&buf, "logger: ", log.Lshortfile)
+				logger.Print(m)
+				fmt.Print(&buf)
 				continue
 			}
 			event := string(b)
