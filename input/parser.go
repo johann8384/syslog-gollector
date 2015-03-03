@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"regexp"
 	"strconv"
-	"log"
 	"github.com/rcrowley/go-metrics"
+	"fmt"
+	log "code.google.com/p/log4go"
 )
 
 // A Rfc5424Parser parses Syslog messages.
@@ -62,10 +63,6 @@ func (p *Rfc5424Parser) StreamingParse(in chan string) (chan string, error) {
 			}
 			b, err := json.Marshal(*parsed)
 			if err != nil {
-				var buf bytes.Buffer
-				logger := log.New(&buf, "logger: ", log.Lshortfile)
-				logger.Print(m)
-				fmt.Print(&buf)
 				continue
 			}
 			event := string(b)
@@ -80,7 +77,8 @@ func (p *Rfc5424Parser) StreamingParse(in chan string) (chan string, error) {
 func (p *Rfc5424Parser) Parse(raw string) *ParsedMessage {
 	m := p.regex.FindStringSubmatch(raw)
 	if m == nil || len(m) != 9 {
-		p.dropped.Inc(1)
+		log.Error("Could not parse raw: %s", raw)
+		p.dropped.Inc(1000)
 		return nil
 	}
 	p.parsed.Inc(1)
