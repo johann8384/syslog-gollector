@@ -142,6 +142,7 @@ func main() {
 	log.Info("kafka buffer bytes: %d", kBufferBytes)
 	log.Info("parsing enabled: %t", pEnabled)
 	log.Info("channel buffering capacity: %d", cCapacity)
+	log.Info("running modification 6")
 
 	// Prep the channels
 	rawChan := make(chan string, cCapacity)
