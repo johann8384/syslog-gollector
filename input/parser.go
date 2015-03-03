@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"github.com/rcrowley/go-metrics"
-	"fmt"
 	log "code.google.com/p/log4go"
 )
 
@@ -32,7 +31,8 @@ type ParsedMessage struct {
 // Returns an initialized Rfc5424Parser.
 func NewRfc5424Parser() *Rfc5424Parser {
 	p := &Rfc5424Parser{}
-	r := regexp.MustCompile(`(?s)<([0-9]{1,3})>([0-9])\s(.+)\s(.+)\s(.+)\s([0-9]{1,5})\s([\w-]+)\s(.+$)`)
+//	r := regexp.MustCompile(`(?s)<([0-9]{1,3})>([0-9])\s(.+)\s(.+)\s(.+)\s([0-9]{1,5})\s([\w-]+)\s(.+$)`)
+	r := regexp.MustCompile(`(?s)<([0-9]{1,3})>([0-9])\s(\d{4}-\d{2}-\d{2}T\d{2}\:\d{2}\:\d{2}[+-]\d{2}\:\d{2})\s+([\S]+)\s([0-9\S]+)\s+([\S]*)\s+-\s+([\S]*):?\s+(.+$)`)
 	p.regex = r
 
 	// Initialize metrics
@@ -77,7 +77,7 @@ func (p *Rfc5424Parser) StreamingParse(in chan string) (chan string, error) {
 func (p *Rfc5424Parser) Parse(raw string) *ParsedMessage {
 	m := p.regex.FindStringSubmatch(raw)
 	if m == nil || len(m) != 9 {
-		log.Error("Could not parse raw: %s", raw)
+		log.Debug("Could not parse raw: %s", raw)
 		p.dropped.Inc(1000)
 		return nil
 	}
